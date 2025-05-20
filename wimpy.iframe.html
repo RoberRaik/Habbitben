@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<meta http-equiv="X-UA-Compatible" content="IE=Edge">
+<meta charset="UTF-8">
+<title>Wimpy Player Iframe</title>
+<!--<link href="wimpy.css" rel="stylesheet" type="text/css">-->
+<script src="wimpy.js"></script>
+
+<!-- Redirige a HTTPS si se accede por HTTP -->
+<script>
+if (location.protocol === 'http:') {
+    location.href = location.href.replace('http:', 'https:');
+}
+</script>
+
+<style>
+html,body {
+    width : 100%;
+    height : 100%;
+	margin:0;
+	padding:0;
+	overflow:visible;
+}
+.full {
+    left:0px;
+    top:0px;
+    width : 100%;
+    height : 100%;
+}
+</style>
+</head>
+
+<body>
+<div class="full" id="wimpyTarget"></div>
+
+<script>
+function getParamsAsObject () {
+	var retval = {};
+	var loc = self.location.href.split("?");
+	var unescapeHTML = function(s) {
+		return s.toString().split('&quot;').join('"').split('&lt;').join('<').split('&amp;').join('&');
+	}
+	var forceHTTPS = function(url) {
+		if (typeof url === 'string' && url.indexOf("http://") === 0) {
+			return url.replace("http://", "https://");
+		}
+		return url;
+	}
+
+	if(loc.length > 1){
+		loc.shift();
+		loc = unescapeHTML( decodeURIComponent( loc.join("") ) );
+		var qs = loc.split("&");
+		for (var i=0; i<qs.length; i++) {
+			var item = qs[i].split("=");
+			var key = item.shift();
+			var val = decodeURIComponent(item.join("="));
+
+			// Forzar HTTPS si es una URL
+			val = forceHTTPS(val);
+
+			retval[key] = val;
+		}
+	}
+	return retval;
+}
+
+var myPlayer;
+function makePlayer(){
+	var params = getParamsAsObject();
+	params.target = "wimpyTarget";
+	myPlayer = new wimpyPlayer(params);
+}
+wimpy.onReady(makePlayer);
+</script>
+
+</body>
+</html>
